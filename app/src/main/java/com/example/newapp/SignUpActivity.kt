@@ -34,7 +34,7 @@ class SignUpActivity : AppCompatActivity() {
         }
 
         binding.tvContinueAsGuest.setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
+            startActivity(Intent(this, HomePage::class.java))
             finish()
         }
         binding.sign.setOnClickListener {

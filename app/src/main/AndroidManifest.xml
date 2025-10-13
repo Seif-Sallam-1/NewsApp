@@ -14,7 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NewApp"
         android:usesCleartextTraffic="true">
-
+        <activity
+            android:name=".HomePage"
+            android:exported="false" />
         <activity
             android:name=".ForgotPasswordActivity"
             android:exported="false" />
