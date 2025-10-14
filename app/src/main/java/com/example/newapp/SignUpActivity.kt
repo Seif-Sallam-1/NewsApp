@@ -34,7 +34,7 @@ class SignUpActivity : AppCompatActivity() {
         }
 
         binding.tvContinueAsGuest.setOnClickListener {
-            startActivity(Intent(this, HomePage::class.java))
+            startActivity(Intent(this, HomeActivity::class.java))
             finish()
         }
         binding.sign.setOnClickListener {
@@ -54,6 +54,14 @@ class SignUpActivity : AppCompatActivity() {
         }
 
 
+    }
+    public override fun onStart() {
+        super.onStart()
+        val currentUser = auth.currentUser
+        if (currentUser != null && currentUser.isEmailVerified) {
+            startActivity(Intent(this, HomeActivity::class.java))
+            finish()
+        }
     }
     private fun addUser(email: String, password: String) {
         auth.createUserWithEmailAndPassword(email, password)

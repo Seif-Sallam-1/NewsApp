@@ -33,13 +33,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun loadNews(){
+        val category = intent.getStringExtra("ApiCategory")?: "general"
         val retrofit = Retrofit
             .Builder()
             .baseUrl("https://newsapi.org")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         val c = retrofit.create(NewsCallable::class.java)
-        c.getNews().enqueue(object : Callback<News>{
+        c.getNews(category).enqueue(object : Callback<News>{
             override fun onResponse(call: Call<News?>, response: Response<News?>) {
                 val news = response.body()
                 val article = news?.articles!!

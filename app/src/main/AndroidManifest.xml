@@ -15,7 +15,7 @@
         android:theme="@style/Theme.NewApp"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".HomePage"
+            android:name=".HomeActivity"
             android:exported="false" />
         <activity
             android:name=".ForgotPasswordActivity"

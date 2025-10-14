@@ -1,3 +1,5 @@
 package com.example.newapp
 
-data class Category(val title: String , val apiName: String)
+import androidx.annotation.DrawableRes
+
+data class Category(val title: String , val apiName: String , @DrawableRes val pic : Int)
