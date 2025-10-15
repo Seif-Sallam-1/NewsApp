@@ -54,6 +54,8 @@ class HomeActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_favorites -> {
+                // TODO: Implement favorites functionality
+                Toast.makeText(this, "Favorites coming soon!", Toast.LENGTH_SHORT).show()
                 true
             }
             R.id.action_settings -> {
@@ -63,7 +65,11 @@ class HomeActivity : AppCompatActivity() {
             R.id.action_logout -> {
                 Firebase.auth.signOut()
                 Toast.makeText(this, "Logged out!", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this, SignUpActivity::class.java))
+
+                // --- FIX: Clear the activity stack on logout ---
+                val intent = Intent(this, SignUpActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
                 finish()
                 true
             }

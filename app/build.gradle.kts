@@ -63,4 +63,14 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.3.0"))
     implementation("com.google.firebase:firebase-auth")
 
+    implementation("com.google.firebase:firebase-firestore-ktx")
+
+    // Kotlin Coroutines for background tasks
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3") // For await()
+
+    // Lifecycle scope for coroutines in Activities
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+
 }

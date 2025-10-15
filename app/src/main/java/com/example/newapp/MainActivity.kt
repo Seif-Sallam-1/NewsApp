@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.LinearLayoutManager // Added import
 import com.example.newapp.databinding.ActivityMainBinding
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -26,12 +27,24 @@ class MainActivity : AppCompatActivity() {
     private val PREFS = "user_prefs"
     private val KEY_COUNTRY = "country_code"
 
+    // --- FIX: Create a single, reusable Retrofit instance ---
+    private val retrofit = Retrofit.Builder()
+        .baseUrl("http://api.mediastack.com/v1/" )
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    private val service = retrofit.create(NewsCallable::class.java)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.topAppBar)
+
+        // --- FIX: Set the LayoutManager for the RecyclerView ---
+        binding.newsList.layoutManager = LinearLayoutManager(this)
+
         loadNews()
         binding.swiprRefresh.setOnRefreshListener {
             loadNews()
@@ -46,6 +59,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadNews() {
+        // --- FIX: Show the progress bar before starting the request ---
+        if (!binding.swiprRefresh.isRefreshing) {
+            binding.progress.isVisible = true
+        }
+
         // Read saved country from SharedPreferences (default = "us")
         val prefs = getSharedPreferences(PREFS, MODE_PRIVATE)
         val country = prefs.getString(KEY_COUNTRY, "us") ?: "us"
@@ -53,30 +71,28 @@ class MainActivity : AppCompatActivity() {
         // Read category (default = general)
         val category = intent.getStringExtra("ApiCategory") ?: "general"
 
-        // Retrofit setup
-        val retrofit = Retrofit.Builder()
-            .baseUrl("http://api.mediastack.com/v1/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val service = retrofit.create(NewsCallable::class.java)
-
-        // API call
+        // API call using the single service instance
         service.getNews(
-            apiKey = "495ef4c93797594ca3daca5ae837d3f7",
+            apiKey = "f08c4601a830b52b41356f98b554ab94",
             country = country,
             category = category
         ).enqueue(object : Callback<News> {
             override fun onResponse(call: Call<News>, response: Response<News>) {
-                val news = response.body()
-                val articles = news?.data ?: arrayListOf()
-                showNews(articles)
+                if (response.isSuccessful) {
+                    val news = response.body()
+                    val articles = news?.data ?: arrayListOf()
+                    showNews(articles)
+                } else {
+                    Log.e("MainActivity", "API Error Response: ${response.errorBody()?.string()}")
+                    Toast.makeText(this@MainActivity, "Failed to load news.", Toast.LENGTH_SHORT).show()
+                }
                 binding.progress.isVisible = false
                 binding.swiprRefresh.isRefreshing = false
             }
 
             override fun onFailure(call: Call<News>, t: Throwable) {
-                Log.e("trace", "Error: ${t.message}")
+                Log.e("MainActivity", "API Failure: ${t.message}", t)
+                Toast.makeText(this@MainActivity, "An error occurred.", Toast.LENGTH_SHORT).show()
                 binding.progress.isVisible = false
                 binding.swiprRefresh.isRefreshing = false
             }
@@ -103,12 +119,15 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.action_favorites -> {
                 // TODO: Add favorites screen later if needed
+                Toast.makeText(this, "Favorites coming soon!", Toast.LENGTH_SHORT).show()
                 true
             }
             R.id.action_logout ->{
                 Firebase.auth.signOut()
                 Toast.makeText(this, "Logged out!", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this, SignUpActivity::class.java))
+                val intent = Intent(this, SignUpActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
                 finish()
                 true
             }
@@ -116,9 +135,5 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        // Reload news if user returns from settings
-        loadNews()
-    }
+    // --- FIX: Removed onResume() to prevent double-loading news ---
 }
