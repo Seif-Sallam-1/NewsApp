@@ -33,6 +33,12 @@ class CategoryAdapter(val activity: Activity, val categories: ArrayList<Category
             activity.startActivity(i)
         }
     }
+    fun updateCategories(newList: List<Category>) {
+        categories.clear()
+        categories.addAll(newList)
+        notifyDataSetChanged()
+    }
+
 
     override fun getItemCount() = categories.size
 }

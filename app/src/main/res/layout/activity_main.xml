@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,12 +8,21 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <!-- ✅ Toolbar to show the menu -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorSurface"
+        app:title="What Now News"
+        app:menu="@menu/top_app_bar_menu" />
 
+    <!-- ✅ Main Content -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipr_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="8dp">
+        android:layout_marginTop="?attr/actionBarSize">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/news_list"
@@ -21,9 +30,7 @@
             tools:listitem="@layout/article_list_item"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
 
     <ProgressBar
         android:layout_gravity="center"
@@ -31,4 +38,4 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-</FrameLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

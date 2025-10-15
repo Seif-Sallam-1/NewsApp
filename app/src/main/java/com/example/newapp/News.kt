@@ -1,11 +1,11 @@
 package com.example.newapp
 
 data class News(
-    val articles : ArrayList<Artical>
+    val data: ArrayList<Article>
 )
 
-data class Artical (
-   val  title: String,
-   val  urlToImage : String,
-   val  url : String ,
+data class Article(
+    val title: String?,
+    val image: String?,
+    val url: String?
 )

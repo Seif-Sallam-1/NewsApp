@@ -11,7 +11,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.newapp.databinding.ArticleListItemBinding
 
-class NewsAdapter(val a : Activity, val articals: ArrayList<Artical>):
+class NewsAdapter(val a : Activity, val articals: ArrayList<Article>):
     RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
 
     class NewsViewHolder(val binding : ArticleListItemBinding): RecyclerView.ViewHolder(binding.root)
@@ -26,7 +26,7 @@ class NewsAdapter(val a : Activity, val articals: ArrayList<Artical>):
 
         Glide
             .with(holder.binding.articleImage.context)
-            .load(articals[position].urlToImage)
+            .load(articals[position].image)
             .error(R.drawable.broken_image)
             .transition(DrawableTransitionOptions.withCrossFade(1000))
             .into(holder.binding.articleImage)
@@ -34,7 +34,7 @@ class NewsAdapter(val a : Activity, val articals: ArrayList<Artical>):
         val url = articals[position].url
 
         holder.binding.articleCont.setOnClickListener {
-            val i = Intent(Intent.ACTION_VIEW,url.toUri())
+            val i = Intent(Intent.ACTION_VIEW, url?.toUri())
             a.startActivity(i)
         }
 
