@@ -118,7 +118,7 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.action_favorites -> {
-                // TODO: Add favorites screen later if needed
+                startActivity(Intent(this, FavoritesActivity::class.java))
                 Toast.makeText(this, "Favorites coming soon!", Toast.LENGTH_SHORT).show()
                 true
             }

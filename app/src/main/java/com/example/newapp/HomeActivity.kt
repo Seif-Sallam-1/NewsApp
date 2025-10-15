@@ -54,7 +54,7 @@ class HomeActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_favorites -> {
-                // TODO: Implement favorites functionality
+                startActivity(Intent(this, FavoritesActivity::class.java))
                 Toast.makeText(this, "Favorites coming soon!", Toast.LENGTH_SHORT).show()
                 true
             }
