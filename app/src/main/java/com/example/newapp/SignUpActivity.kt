@@ -11,6 +11,7 @@ import com.example.newapp.databinding.ActivitySignUpBinding
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import android.view.animation.AnimationUtils
 
 
 class SignUpActivity : AppCompatActivity() {
@@ -53,8 +54,13 @@ class SignUpActivity : AppCompatActivity() {
             }
         }
 
+        val slideUpFadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in_slide_up)
+        binding.main.startAnimation(slideUpFadeIn)
+
+
 
     }
+
     public override fun onStart() {
         super.onStart()
         val currentUser = auth.currentUser

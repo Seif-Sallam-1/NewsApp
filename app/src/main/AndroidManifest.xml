@@ -14,6 +14,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NewApp"
         android:usesCleartextTraffic="true">
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-5627300379761335~1064525065" />
+
+
+
         <activity
             android:name=".FavoritesActivity"
             android:exported="false" />

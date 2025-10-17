@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    //id("com.google.devtools.ksp")
     id("com.google.gms.google-services")
 }
 
@@ -80,4 +81,16 @@ dependencies {
 
     // --- LIFECYCLE SCOPE ---
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.2") // Updated to a more recent stable version
+
+    // This adds Google AdMob SDK (used for showing ads)
+    implementation("com.google.android.gms:play-services-ads:23.1.0")
+
+
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    //ksp ("androidx.room:room-compiler:2.6.1")
 }
+/*ksp ("androidx.room:room-compiler:2.6.1")
+/* Optional but helpful (for coroutines) */
+
+

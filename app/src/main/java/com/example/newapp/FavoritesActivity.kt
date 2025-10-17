@@ -5,41 +5,58 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.example.newapp.data.FavoriteArticle
+import com.example.newapp.data.LocalFavoritesDatabase
 import com.example.newapp.databinding.ActivityFavoritesBinding
 import kotlinx.coroutines.launch
 
-class FavoritesActivity : AppCompatActivity( ) {
+class FavoritesActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityFavoritesBinding
     private lateinit var favoritesAdapter: NewsAdapter
+    private lateinit var localDb: LocalFavoritesDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityFavoritesBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Setup RecyclerView
         setupRecyclerView()
 
-        // Handle back button click in the toolbar
-        binding.topAppBar.setNavigationOnClickListener {
-            finish()
-        }
+        // Back button
+        binding.topAppBar.setNavigationOnClickListener { finish() }
+
+        // Load banner
+        val bannerUrl = "https://example.com/banner.jpg"
+        Glide.with(this)
+            .load(bannerUrl)
+            .into(binding.bannerImage)
+
+        // Initialize local database
+        localDb = LocalFavoritesDatabase(this)
     }
 
     override fun onResume() {
         super.onResume()
-        // Load favorites every time the user comes to this screen
-        // to make sure it's up-to-date.
         loadFavorites()
     }
 
     private fun setupRecyclerView() {
-        // Initialize with an empty list
         favoritesAdapter = NewsAdapter(this, arrayListOf())
         binding.favoritesRecyclerView.apply {
             adapter = favoritesAdapter
             layoutManager = LinearLayoutManager(this@FavoritesActivity)
         }
+    }
+
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager =
+            getSystemService(CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
+        val network = connectivityManager.activeNetwork
+        val capabilities = connectivityManager.getNetworkCapabilities(network)
+        return capabilities != null && capabilities.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
     private fun loadFavorites() {
@@ -48,10 +65,30 @@ class FavoritesActivity : AppCompatActivity( ) {
         binding.favoritesRecyclerView.isVisible = false
 
         lifecycleScope.launch {
-            val favoriteArticles = FirestoreManager.getFavorites()
-
-            // Mark each article as a favorite for the star icon logic
-            favoriteArticles.forEach { it.isFavorite = true }
+            val favoriteArticles: List<Article> = if (isNetworkAvailable()) {
+                val articles = FirestoreManager.getFavorites()
+                articles.forEach { article ->
+                    localDb.addFavorite(
+                        FavoriteArticle(
+                            id = article.url,
+                            title = article.title,
+                            description = "",
+                            imageUrl = article.image
+                        )
+                    )
+                    article.isFavorite = true
+                }
+                articles
+            } else {
+                localDb.getFavorites().map { fav ->
+                    Article(
+                        url = fav.id,
+                        isFavorite = true,
+                        title = fav.title,
+                        image = fav.imageUrl
+                    )
+                }
+            }
 
             binding.progressBar.isVisible = false
             if (favoriteArticles.isEmpty()) {
@@ -61,5 +98,10 @@ class FavoritesActivity : AppCompatActivity( ) {
                 favoritesAdapter.updateArticles(ArrayList(favoriteArticles))
             }
         }
+    }
+
+    private fun removeFavorite(article: Article) {
+        localDb.deleteFavorite(article.url)
+        loadFavorites()
     }
 }

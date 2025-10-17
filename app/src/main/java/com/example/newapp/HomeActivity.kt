@@ -10,14 +10,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.example.newapp.databinding.ActivityHomePageBinding
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+//  Import AdMob classes
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomePageBinding
-
+    private lateinit var adViewHome: AdView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -30,6 +35,10 @@ class HomeActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        val bannerUrl = "https://example.com/banner.jpg"
+        Glide.with(this)
+            .load(bannerUrl)
+            .into(binding.bannerPlaceholder)
 
         val categories = arrayListOf(
             Category("Business", "business", R.drawable.business),
