@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/settingsLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SettingsActivity"
+    android:layout_marginBottom="16dp"
+    android:backgroundTint="@color/ColorOnPrimary">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/settingsTopAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#536DFE"
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="Settings"
+        app:titleTextColor="@android:color/white" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollSection"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/settingsTopAppBar"
+        app:layout_constraintBottom_toTopOf="@id/favorites_recycler_view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:paddingBottom="32dp"
+        android:background="@color/ColorOnPrimary">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:paddingBottom="48dp"
+            android:background="@color/ColorOnPrimary">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select News Country:"
+                android:textStyle="bold"
+                android:textColor="@color/ColorPrimary"
+                android:textSize="18sp"
+                android:paddingBottom="8dp"/>
+
+            <RadioGroup
+                android:id="@+id/radioGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RadioButton
+                    android:id="@+id/radioUs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="United States 🇺🇸"
+                    android:textColor="#000"
+                    android:textStyle="bold" />
+
+                <RadioButton
+                    android:id="@+id/radioEg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Egypt 🇪🇬"
+                    android:textColor="#000"
+                    android:textStyle="bold" />
+
+                <RadioButton
+                    android:id="@+id/radioGb"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="United Kingdom 🇬🇧"
+                    android:textColor="#000"
+                    android:textStyle="bold" />
+
+                <RadioButton
+                    android:id="@+id/radioFr"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="France 🇫🇷"
+                    android:textColor="#000"
+                    android:textStyle="bold" />
+
+                <RadioButton
+                    android:id="@+id/radioDe"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Germany 🇩🇪"
+                    android:textColor="#000"
+                    android:textStyle="bold" />
+
+                <RadioButton
+                    android:id="@+id/radioIt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Italy 🇮🇹"
+                    android:textColor="#000"
+                    android:textStyle="bold" />
+            </RadioGroup>
+
+            <Button
+                android:id="@+id/saveBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="#536DFE"
+                android:text="Save"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/favorites_recycler_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/scrollSection"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/article_list_item" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

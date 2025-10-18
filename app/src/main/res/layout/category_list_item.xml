@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
-            android:textColor="?attr/colorOnPrimary"
+            android:textColor="@color/black"
             android:textSize="36sp"
             android:textStyle="bold"
             tools:text="@tools:sample/full_names" />

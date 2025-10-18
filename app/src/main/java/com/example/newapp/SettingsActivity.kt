@@ -28,7 +28,7 @@ class SettingsActivity : AppCompatActivity() {
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        setupProductAds()
+        //setupProductAds()
 
 
         val prefs = getSharedPreferences(PREFS, MODE_PRIVATE)
@@ -44,7 +44,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.saveBtn.setOnClickListener {
-            val selectedCode = when (binding.radioGroup.checkedRadioButtonId) {
+            val selectedCode = when (binding.radioGroup?.checkedRadioButtonId) {
                 binding.radioEg.id -> "eg"
                 binding.radioGb.id -> "gb"
                 binding.radioFr.id -> "fr"
@@ -60,34 +60,34 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupProductAds() {
-        val products = listOf(
-            mapOf("image" to R.drawable.product_1, "price" to "$49.99", "url" to "https://www.amazon.com/s?k=headphones" ),
-            mapOf("image" to R.drawable.product_2, "price" to "$129.50", "url" to "https://www.amazon.com/s?k=smart+watch" ),
-            mapOf("image" to R.drawable.product_3, "price" to "$14.95", "url" to "https://www.amazon.com/s?k=bestseller+books" ),
-            mapOf("image" to R.drawable.product_4, "price" to "$22.00", "url" to "https://www.amazon.com/s?k=coffee+mug" ),
-            mapOf("image" to R.drawable.product_5, "price" to "$35.75", "url" to "https://www.amazon.com/s?k=indoor+plant" )
-        )
-
-        val container = findViewById<LinearLayout>(R.id.product_ads_container)
-        val inflater = LayoutInflater.from(this)
-        container.removeAllViews()
-
-        for (product in products) {
-            val adItemBinding = AdProductItemBinding.inflate(inflater, container, false)
-            adItemBinding.productImage.setImageResource(product["image"] as Int)
-            adItemBinding.productPrice.text = product["price"] as String
-            adItemBinding.root.setOnClickListener {
-                val url = product["url"] as String
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                try {
-                    startActivity(intent)
-                } catch (e: Exception) {
-                    Toast.makeText(this, "Could not open link", Toast.LENGTH_SHORT).show()
-                }
-            }
-            container.addView(adItemBinding.root)
-        }
-    }
+//    private fun setupProductAds() {
+//        val products = listOf(
+//            mapOf("image" to R.drawable.product_1, "price" to "$49.99", "url" to "https://www.amazon.com/s?k=headphones" ),
+//            mapOf("image" to R.drawable.product_2, "price" to "$129.50", "url" to "https://www.amazon.com/s?k=smart+watch" ),
+//            mapOf("image" to R.drawable.product_3, "price" to "$14.95", "url" to "https://www.amazon.com/s?k=bestseller+books" ),
+//            mapOf("image" to R.drawable.product_4, "price" to "$22.00", "url" to "https://www.amazon.com/s?k=coffee+mug" ),
+//            mapOf("image" to R.drawable.product_5, "price" to "$35.75", "url" to "https://www.amazon.com/s?k=indoor+plant" )
+//        )
+//
+//        val container = findViewById<LinearLayout>(R.id.product_ads_container)
+//        val inflater = LayoutInflater.from(this)
+//        container.removeAllViews()
+//
+//        for (product in products) {
+//            val adItemBinding = AdProductItemBinding.inflate(inflater, container, false)
+//            adItemBinding.productImage.setImageResource(product["image"] as Int)
+//            adItemBinding.productPrice.text = product["price"] as String
+//            adItemBinding.root.setOnClickListener {
+//                val url = product["url"] as String
+//                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+//                try {
+//                    startActivity(intent)
+//                } catch (e: Exception) {
+//                    Toast.makeText(this, "Could not open link", Toast.LENGTH_SHORT).show()
+//                }
+//            }
+//            container.addView(adItemBinding.root)
+//        }
+//    }
 
 }
