@@ -23,8 +23,6 @@ class SettingsActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // Edge-to-edge padding
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -62,10 +60,7 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    // PASTE THIS FUNCTION INTO ALL THREE ACTIVITY FILES
-
     private fun setupProductAds() {
-        // Define our 5 static "products"
         val products = listOf(
             mapOf("image" to R.drawable.product_1, "price" to "$49.99", "url" to "https://www.amazon.com/s?k=headphones" ),
             mapOf("image" to R.drawable.product_2, "price" to "$129.50", "url" to "https://www.amazon.com/s?k=smart+watch" ),
@@ -74,11 +69,8 @@ class SettingsActivity : AppCompatActivity() {
             mapOf("image" to R.drawable.product_5, "price" to "$35.75", "url" to "https://www.amazon.com/s?k=indoor+plant" )
         )
 
-        // Find the container from the included layout
         val container = findViewById<LinearLayout>(R.id.product_ads_container)
         val inflater = LayoutInflater.from(this)
-
-        // Clear any existing views to prevent duplicates
         container.removeAllViews()
 
         for (product in products) {

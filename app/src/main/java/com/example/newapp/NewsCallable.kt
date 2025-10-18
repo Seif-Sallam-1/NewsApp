@@ -1,6 +1,5 @@
 package com.example.newapp
 
-import android.R
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query

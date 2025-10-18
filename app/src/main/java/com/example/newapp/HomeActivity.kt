@@ -17,6 +17,7 @@ import com.example.newapp.databinding.ActivityHomePageBinding
 import com.example.newapp.databinding.AdProductItemBinding
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import androidx.core.net.toUri
 
 class HomeActivity : AppCompatActivity() {
 
@@ -35,10 +36,8 @@ class HomeActivity : AppCompatActivity() {
             insets
         }
 
-        // --- SETUP THE AMAZON-STYLE AD BANNER ---
         setupProductAds()
 
-        // --- Your existing category setup (this is correct) ---
         val categories = arrayListOf(
             Category("Business", "business", R.drawable.business),
             Category("Entertainment", "entertainment", R.drawable.entertainment),
@@ -55,7 +54,6 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setupProductAds() {
-        // Define our 5 static "products" with their image and a fake Amazon URL
         val products = listOf(
             mapOf("image" to R.drawable.product_1, "price" to "$49.99", "url" to "https://www.amazon.com/s?k=headphones" ),
             mapOf("image" to R.drawable.product_2, "price" to "$129.50", "url" to "https://www.amazon.com/s?k=smart+watch" ),
@@ -67,27 +65,19 @@ class HomeActivity : AppCompatActivity() {
         val container = binding.productAdsContainer
         val inflater = LayoutInflater.from(this)
 
-        // Loop through the products and create a view for each one
         for (product in products) {
-            // Inflate the single product item layout
             val adItemBinding = AdProductItemBinding.inflate(inflater, container, false)
-
-            // Set the image and price
             adItemBinding.productImage.setImageResource(product["image"] as Int)
             adItemBinding.productPrice.text = product["price"] as String
-
-            // Set the click listener to open the URL
             adItemBinding.root.setOnClickListener {
                 val url = product["url"] as String
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                val intent = Intent(Intent.ACTION_VIEW, url.toUri())
                 try {
                     startActivity(intent)
                 } catch (e: Exception) {
                     Toast.makeText(this, "Could not open link", Toast.LENGTH_SHORT).show()
                 }
             }
-
-            // Add the newly created view to the horizontal container
             container.addView(adItemBinding.root)
         }
     }
@@ -98,7 +88,6 @@ class HomeActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Your existing menu handling code...
         return when (item.itemId) {
             R.id.action_favorites -> {
                 startActivity(Intent(this, FavoritesActivity::class.java))

@@ -8,7 +8,6 @@
     android:background="@color/GrayLight"
     tools:context=".SettingsActivity">
 
-    <!-- Top App Bar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/settingsTopAppBar"
         android:layout_width="match_parent"
@@ -18,7 +17,6 @@
         app:title="Settings"
         app:titleTextColor="@android:color/white" />
 
-    <!-- Country Selection Section -->
     <LinearLayout
         android:id="@+id/countrySection"
         android:layout_width="0dp"
@@ -60,7 +58,6 @@
                 android:layout_height="wrap_content"
                 android:text="United Kingdom 🇬🇧" />
 
-            <!-- ✅ New country -->
             <RadioButton
                 android:id="@+id/radioFr"
                 android:layout_width="wrap_content"
@@ -103,7 +100,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- RecyclerView (Favorites List ) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/favorites_recycler_view"
         android:layout_width="0dp"
@@ -113,7 +109,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:listitem="@layout/article_list_item" />
 
-    <!-- Progress Bar & Empty Text -->
     <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"

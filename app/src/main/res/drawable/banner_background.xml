@@ -2,7 +2,6 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
 
-    <!-- You can customize these colors to match your app's theme -->
     <gradient
         android:angle="45"
         android:startColor="#4E65FF"

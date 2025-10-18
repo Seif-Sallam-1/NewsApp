@@ -5,7 +5,6 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
-// ✅ Represents one saved favorite article
 data class FavoriteArticle(
     val id: String?,
     val title: String?,
@@ -13,12 +12,10 @@ data class FavoriteArticle(
     val imageUrl: String?
 )
 
-// ✅ SQLite helper for saving favorites locally (offline)
 class LocalFavoritesDatabase(context: Context) :
-    SQLiteOpenHelper(context, "favorites.db", null, 1) {
+    SQLiteOpenHelper(context, "favorites.db", null, 2) {
 
     override fun onCreate(db: SQLiteDatabase) {
-        // Create table when database is first created
         db.execSQL(
             """
             CREATE TABLE IF NOT EXISTS favorites (
@@ -29,15 +26,30 @@ class LocalFavoritesDatabase(context: Context) :
             )
             """.trimIndent()
         )
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS pending_deletions (
+                url TEXT PRIMARY KEY
+            )
+            """.trimIndent()
+        )
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        // If schema changes, recreate the table
-        db.execSQL("DROP TABLE IF EXISTS favorites")
-        onCreate(db)
+        if (oldVersion < 2) {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS pending_deletions (
+                    url TEXT PRIMARY KEY
+                )
+                """.trimIndent()
+            )
+        } else {
+            db.execSQL("DROP TABLE IF EXISTS favorites")
+            db.execSQL("DROP TABLE IF EXISTS pending_deletions")
+            onCreate(db)
+        }
     }
-
-    // ✅ Add or update a favorite article
     fun addFavorite(article: FavoriteArticle) {
         val values = ContentValues().apply {
             put("id", article.id)
@@ -53,11 +65,9 @@ class LocalFavoritesDatabase(context: Context) :
         )
     }
 
-    // ✅ Get all favorite articles
     fun getFavorites(): List<FavoriteArticle> {
         val list = mutableListOf<FavoriteArticle>()
         val cursor = readableDatabase.rawQuery("SELECT * FROM favorites", null)
-
         if (cursor.moveToFirst()) {
             do {
                 val article = FavoriteArticle(
@@ -69,27 +79,43 @@ class LocalFavoritesDatabase(context: Context) :
                 list.add(article)
             } while (cursor.moveToNext())
         }
-
         cursor.close()
         return list
     }
 
-    // ✅ Delete one favorite by ID
     fun deleteFavorite(id: String?) {
         writableDatabase.delete("favorites", "id = ?", arrayOf(id))
     }
-    fun deleteAllFavorite() {
+
+    fun deleteAllFavorites() {
         writableDatabase.delete("favorites", null, null)
     }
 
-    // ✅ Check if an article exists in favorites
-    fun isFavorite(id: String): Boolean {
-        val cursor = readableDatabase.rawQuery(
-            "SELECT id FROM favorites WHERE id = ?",
-            arrayOf(id)
+    fun addPendingDeletion(url: String) {
+        val values = ContentValues().apply {
+            put("url", url)
+        }
+        writableDatabase.insertWithOnConflict(
+            "pending_deletions",
+            null,
+            values,
+            SQLiteDatabase.CONFLICT_REPLACE
         )
-        val exists = cursor.count > 0
+    }
+
+    fun getPendingDeletions(): List<String> {
+        val list = mutableListOf<String>()
+        val cursor = readableDatabase.rawQuery("SELECT * FROM pending_deletions", null)
+        if (cursor.moveToFirst()) {
+            do {
+                list.add(cursor.getString(cursor.getColumnIndexOrThrow("url")))
+            } while (cursor.moveToNext())
+        }
         cursor.close()
-        return exists
+        return list
+    }
+
+    fun clearPendingDeletions() {
+        writableDatabase.delete("pending_deletions", null, null)
     }
 }

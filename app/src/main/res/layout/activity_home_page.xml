@@ -8,7 +8,6 @@
     android:layout_height="match_parent"
     tools:context=".HomeActivity">
 
-    <!-- Toolbar at top (This seems to be from your provided XML, keeping it ) -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/top_app_bar"
         android:layout_width="match_parent"
@@ -20,8 +19,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Professional Placeholder Banner Layout (Fixed at the bottom) -->
-    <!-- Professional "Amazon-Style" Ad Banner -->
     <LinearLayout
         android:id="@+id/bannerPlaceholder"
         android:layout_width="0dp"
@@ -46,7 +43,6 @@
             android:layout_gravity="start"
             android:alpha="0.7"/>
 
-        <!-- This horizontal LinearLayout will hold the 5 product boxes -->
         <LinearLayout
             android:id="@+id/product_ads_container"
             android:layout_width="match_parent"
@@ -55,14 +51,12 @@
             android:layout_marginTop="4dp"
             android:baselineAligned="false">
 
-            <!-- We will add the 5 product boxes here from the Kotlin code -->
 
         </LinearLayout>
 
     </LinearLayout>
 
 
-    <!-- RecyclerView fills the space between the toolbar and the banner -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/categoryRecyclerView"
         android:layout_width="0dp"

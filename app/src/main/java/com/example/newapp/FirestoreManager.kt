@@ -13,8 +13,6 @@ object FirestoreManager {
     private fun getCurrentUserId(): String? {
         return Firebase.auth.currentUser?.uid
     }
-
-    // --- MODIFIED TO RETURN THE NEW DOCUMENT'S ID ---
     suspend fun addFavorite(article: Article): String? {
         val userId = getCurrentUserId() ?: return null
         val favoritesCollection = Firebase.firestore
@@ -22,14 +20,11 @@ object FirestoreManager {
             .document(userId)
             .collection(COLLECTION_FAVORITES)
 
-        // Use .add() which returns a Task<DocumentReference>
         val documentReference = favoritesCollection.add(article).await()
 
-        // Return the ID of the newly created document
         return documentReference.id
     }
 
-    // This function is already correct
     suspend fun removeFavorite(firestoreId: String) {
         val userId = getCurrentUserId() ?: return
         Firebase.firestore
@@ -41,7 +36,6 @@ object FirestoreManager {
             .await()
     }
 
-    // This function is also correct
     suspend fun getFavorites(): List<Article> {
         val userId = getCurrentUserId() ?: return emptyList()
 

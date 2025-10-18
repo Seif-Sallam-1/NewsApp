@@ -33,45 +33,117 @@ class FavoritesActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // 1. Enable Edge-to-Edge display
         enableEdgeToEdge()
         binding = ActivityFavoritesBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // 2. Set the custom toolbar as the main ActionBar
         setSupportActionBar(binding.topAppBar)
-        supportActionBar?.title = "Favorites" // Set title programmatically
+        supportActionBar?.title = "Favorites"
         setupProductAds()
-
-        // 3. Add padding to prevent UI from overlapping with the status bar
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
-        // Initialize local database
         localDb = LocalFavoritesDatabase(this)
-
-        // Setup RecyclerView
         setupRecyclerView()
-
-        // Load banner image (if you have one)
-        // val bannerUrl = "https://example.com/banner.jpg"
-        // Glide.with(this ).load(bannerUrl).into(binding.bannerImage)
     }
 
     override fun onResume() {
         super.onResume()
-        // Load favorites every time the screen is shown to keep it updated
         loadFavorites()
     }
 
     private fun setupRecyclerView() {
-        favoritesAdapter = NewsAdapter(this, arrayListOf())
+        favoritesAdapter = NewsAdapter(this, arrayListOf()) { article ->
+            removeFavorite(article)
+        }
         binding.favoritesRecyclerView.apply {
             adapter = favoritesAdapter
             layoutManager = LinearLayoutManager(this@FavoritesActivity)
+        }
+    }
+
+    private fun removeFavorite(article: Article) {
+        val currentList = (binding.favoritesRecyclerView.adapter as? NewsAdapter)?.getArticles()?.toMutableList()
+        if (currentList != null && currentList.remove(article)) {
+            (binding.favoritesRecyclerView.adapter as? NewsAdapter)?.updateArticles(currentList as ArrayList<Article>)
+        }
+        if (currentList.isNullOrEmpty()) {
+            binding.emptyText.isVisible = true
+        }
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            article.url?.let { url ->
+                localDb.deleteFavorite(url)
+
+                if (isNetworkAvailable()) {
+                    article.firestoreId?.let { FirestoreManager.removeFavorite(it) }
+                } else {
+                    localDb.addPendingDeletion(url)
+                }
+            }
+        }
+        Toast.makeText(this, "Removed from favorites", Toast.LENGTH_SHORT).show()
+    }
+    private fun loadFavorites() {
+        binding.progressBar.isVisible = true
+        binding.emptyText.isVisible = false
+        binding.favoritesRecyclerView.isVisible = false
+
+        lifecycleScope.launch {
+            if (isNetworkAvailable()) {
+                withContext(Dispatchers.IO) {
+                    val pendingDeletionUrls = localDb.getPendingDeletions()
+                    if (pendingDeletionUrls.isNotEmpty()) {
+                        val firestoreFavorites = FirestoreManager.getFavorites()
+                        val favoritesToDelete = firestoreFavorites.filter { fav ->
+                            pendingDeletionUrls.contains(fav.url)
+                        }
+                        favoritesToDelete.forEach { favToDelete ->
+                            favToDelete.firestoreId?.let { FirestoreManager.removeFavorite(it) }
+                        }
+                        localDb.clearPendingDeletions()
+                    }
+                }
+                val favoriteArticles = withContext(Dispatchers.IO) {
+                    val firestoreFavorites = FirestoreManager.getFavorites()
+                    localDb.deleteAllFavorites()
+                    firestoreFavorites.forEach { article ->
+                        localDb.addFavorite(
+                            FavoriteArticle(
+                                id = article.url ?: "", title = article.title,
+                                imageUrl = article.image, description = article.description
+                            )
+                        )
+                        article.isFavorite = true
+                    }
+                    firestoreFavorites
+                }
+                displayFavorites(favoriteArticles)
+
+            } else {
+                Toast.makeText(this@FavoritesActivity, "Offline mode: Showing saved favorites", Toast.LENGTH_SHORT).show()
+                val favoriteArticles = withContext(Dispatchers.IO) {
+                    localDb.getFavorites().map { fav ->
+                        Article(
+                            url = fav.id, title = fav.title, description = fav.description,
+                            image = fav.imageUrl, isFavorite = true, firestoreId = null
+                        )
+                    }
+                }
+                displayFavorites(favoriteArticles)
+            }
+        }
+    }
+    private fun displayFavorites(articles: List<Article>) {
+        binding.progressBar.isVisible = false
+        if (articles.isEmpty()) {
+            binding.emptyText.isVisible = true
+            binding.favoritesRecyclerView.isVisible = false
+        } else {
+            binding.emptyText.isVisible = false
+            binding.favoritesRecyclerView.isVisible = true
+            favoritesAdapter.updateArticles(ArrayList(articles))
         }
     }
 
@@ -82,59 +154,6 @@ class FavoritesActivity : AppCompatActivity() {
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
-    private fun loadFavorites() {
-        binding.progressBar.isVisible = true
-        binding.emptyText.isVisible = false
-        binding.favoritesRecyclerView.isVisible = false
-
-        lifecycleScope.launch {
-            val favoriteArticles: List<Article> = if (isNetworkAvailable()) {
-                // Online: Fetch from Firestore, then update local DB
-                withContext(Dispatchers.IO) {
-                    val firestoreFavorites = FirestoreManager.getFavorites()
-                    // Clear old local favorites to ensure sync
-
-                    localDb.deleteAllFavorite()
-                    firestoreFavorites.forEach { article ->
-                        // Add each article to the local database
-                        val favorite = FavoriteArticle(
-                            id = article.url ?: "", // Use URL as a unique ID
-                            title = article.title,
-                            imageUrl = article.image,
-                            description = article.description
-                            )
-                        localDb.addFavorite(favorite)
-                        article.isFavorite = true // Mark for UI
-                    }
-                    firestoreFavorites // Return the list to be displayed
-                }
-            } else {
-                // Offline: Fetch from local DB
-                Toast.makeText(this@FavoritesActivity, "Offline mode: Showing saved favorites", Toast.LENGTH_SHORT).show()
-                withContext(Dispatchers.IO) {
-                    localDb.getFavorites().map { fav ->
-                        Article(
-                            url = fav.id,title = fav.title,
-                            description = fav.description, // <-- Add this line
-                            image = fav.imageUrl,
-                            isFavorite = true,
-                            firestoreId = null
-                        )
-                    }
-                }
-            }
-
-            binding.progressBar.isVisible = false
-            if (favoriteArticles.isEmpty()) {
-                binding.emptyText.isVisible = true
-            } else {
-                binding.favoritesRecyclerView.isVisible = true
-                favoritesAdapter.updateArticles(ArrayList(favoriteArticles))
-            }
-        }
-    }
-
-    // 4. Add the functions to create and handle the options menu
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.top_app_bar_menu, menu)
         return true
@@ -143,7 +162,6 @@ class FavoritesActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_favorites -> {
-                // User is already on this screen
                 Toast.makeText(this, "You are already on the Favorites screen", Toast.LENGTH_SHORT).show()
                 true
             }
@@ -163,21 +181,17 @@ class FavoritesActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
+
     private fun setupProductAds() {
-        // Define our 5 static "products"
         val products = listOf(
-            mapOf("image" to R.drawable.product_1, "price" to "$49.99", "url" to "https://www.amazon.com/s?k=headphones" ),
-            mapOf("image" to R.drawable.product_2, "price" to "$129.50", "url" to "https://www.amazon.com/s?k=smart+watch" ),
-            mapOf("image" to R.drawable.product_3, "price" to "$14.95", "url" to "https://www.amazon.com/s?k=bestseller+books" ),
-            mapOf("image" to R.drawable.product_4, "price" to "$22.00", "url" to "https://www.amazon.com/s?k=coffee+mug" ),
-            mapOf("image" to R.drawable.product_5, "price" to "$35.75", "url" to "https://www.amazon.com/s?k=indoor+plant" )
+            mapOf("image" to R.drawable.product_1, "price" to "$49.99", "url" to "https://www.amazon.com/s?k=headphones"  ),
+            mapOf("image" to R.drawable.product_2, "price" to "$129.50", "url" to "https://www.amazon.com/s?k=smart+watch"  ),
+            mapOf("image" to R.drawable.product_3, "price" to "$14.95", "url" to "https://www.amazon.com/s?k=bestseller+books"  ),
+            mapOf("image" to R.drawable.product_4, "price" to "$22.00", "url" to "https://www.amazon.com/s?k=coffee+mug"  ),
+            mapOf("image" to R.drawable.product_5, "price" to "$35.75", "url" to "https://www.amazon.com/s?k=indoor+plant"  )
         )
-
-        // Find the container from the included layout
-        val container = findViewById<LinearLayout>(R.id.product_ads_container)
+        val container = findViewById<LinearLayout>(R.id.product_ads_container) ?: return
         val inflater = LayoutInflater.from(this)
-
-        // Clear any existing views to prevent duplicates
         container.removeAllViews()
 
         for (product in products) {
@@ -197,3 +211,6 @@ class FavoritesActivity : AppCompatActivity() {
         }
     }
 }
+
+
+

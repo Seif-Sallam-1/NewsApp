@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- This is our reusable banner that we can include anywhere -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/bannerPlaceholder"
     android:layout_width="match_parent"
@@ -18,7 +17,6 @@
         android:layout_gravity="start"
         android:alpha="0.7"/>
 
-    <!-- This horizontal LinearLayout will hold the 5 product boxes -->
     <LinearLayout
         android:id="@+id/product_ads_container"
         android:layout_width="match_parent"
@@ -26,7 +24,6 @@
         android:orientation="horizontal"
         android:layout_marginTop="4dp"
         android:baselineAligned="false">
-        <!-- Product boxes will be added here from Kotlin code -->
     </LinearLayout>
 
 </LinearLayout>

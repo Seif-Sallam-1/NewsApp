@@ -60,7 +60,6 @@ class MainActivity : AppCompatActivity() {
         setupProductAds()
     }
 
-    // --- MODIFIED TO SYNC WITH FIRESTORE ---
     private fun loadNews() {
         if (!binding.swiprRefresh.isRefreshing) {
             binding.progress.isVisible = true
@@ -70,22 +69,19 @@ class MainActivity : AppCompatActivity() {
         val country = prefs.getString(KEY_COUNTRY, "us") ?: "us"
         val category = intent.getStringExtra("ApiCategory") ?: "general"
 
-        // Use a coroutine to fetch favorites from Firestore in the background
         lifecycleScope.launch {
             val favoriteArticles = withContext(Dispatchers.IO) {
                 FirestoreManager.getFavorites()
             }
 
-            // After getting favorites, make the API call for news
             service.getNews(
-                apiKey = "f08c4601a830b52b41356f98b554ab94", // Your API Key
+                apiKey = "6e4597c06bc2644286eb59dffc99cbad",
                 country = country,
                 category = category
             ).enqueue(object : Callback<News> {
                 override fun onResponse(call: Call<News>, response: Response<News>) {
                     if (response.isSuccessful) {
                         val apiArticles = response.body()?.data ?: arrayListOf()
-                        // Pass both lists to be synced before displaying
                         showNews(apiArticles, favoriteArticles)
                     } else {
                         Log.e("MainActivity", "API Error: ${response.errorBody()?.string()}")
@@ -104,28 +100,38 @@ class MainActivity : AppCompatActivity() {
             })
         }
     }
-
-    // --- MODIFIED TO SYNC THE LISTS BEFORE DISPLAYING ---
     private fun showNews(apiArticles: ArrayList<Article>, favoriteArticles: List<Article>) {
-        // Create a map of favorite URLs to their Firestore IDs for fast checking
         val favoriteUrlToIdMap = favoriteArticles.associateBy({ it.url }, { it.firestoreId })
 
-        // Loop through each article from the API
         apiArticles.forEach { apiArticle ->
-            // Check if this article's URL exists in our map of favorites
             if (favoriteUrlToIdMap.containsKey(apiArticle.url)) {
-                // If it's a favorite, update its state and give it the correct Firestore ID
                 apiArticle.isFavorite = true
                 apiArticle.firestoreId = favoriteUrlToIdMap[apiArticle.url]
             }
         }
 
-        // The adapter now receives a list where favorites are correctly marked
-        val adapter = NewsAdapter(this, apiArticles)
+        val adapter = NewsAdapter(this, apiArticles) { article ->
+            article.isFavorite = !article.isFavorite
+            val position = (binding.newsList.adapter as NewsAdapter).getArticles().indexOf(article)
+            if (position != -1) {
+                binding.newsList.adapter?.notifyItemChanged(position)
+            }
+            lifecycleScope.launch(Dispatchers.IO) {
+                if (article.isFavorite) {
+                    val newId = FirestoreManager.addFavorite(article)
+                    withContext(Dispatchers.Main) {
+                        article.firestoreId = newId
+                    }
+                } else {
+                    article.firestoreId?.let { id ->
+                        FirestoreManager.removeFavorite(id)
+                    }
+                }
+            }
+        }
         binding.newsList.adapter = adapter
     }
 
-    // -------- Menu handling --------
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.top_app_bar_menu, menu)
         return true
@@ -156,11 +162,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupProductAds() {
         val products = listOf(
-            mapOf("image" to R.drawable.product_1, "price" to "$49.99", "url" to "https://www.amazon.com/s?k=headphones" ),
-            mapOf("image" to R.drawable.product_2, "price" to "$129.50", "url" to "https://www.amazon.com/s?k=smart+watch" ),
-            mapOf("image" to R.drawable.product_3, "price" to "$14.95", "url" to "https://www.amazon.com/s?k=bestseller+books" ),
-            mapOf("image" to R.drawable.product_4, "price" to "$22.00", "url" to "https://www.amazon.com/s?k=coffee+mug" ),
-            mapOf("image" to R.drawable.product_5, "price" to "$35.75", "url" to "https://www.amazon.com/s?k=indoor+plant" )
+            mapOf("image" to R.drawable.product_1, "price" to "$49.99", "url" to "https://www.amazon.com/s?k=headphones"  ),
+            mapOf("image" to R.drawable.product_2, "price" to "$129.50", "url" to "https://www.amazon.com/s?k=smart+watch"  ),
+            mapOf("image" to R.drawable.product_3, "price" to "$14.95", "url" to "https://www.amazon.com/s?k=bestseller+books"  ),
+            mapOf("image" to R.drawable.product_4, "price" to "$22.00", "url" to "https://www.amazon.com/s?k=coffee+mug"  ),
+            mapOf("image" to R.drawable.product_5, "price" to "$35.75", "url" to "https://www.amazon.com/s?k=indoor+plant"  )
         )
         val container = findViewById<LinearLayout>(R.id.product_ads_container) ?: return
         val inflater = LayoutInflater.from(this)
