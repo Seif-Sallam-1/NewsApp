@@ -11,6 +11,7 @@ data class News(
 data class Article(
     val title: String? = null,
     val image: String? = null,
+    val description: String?,
     val url: String? = null,
 
     // These annotations now work correctly because the import is fixed.

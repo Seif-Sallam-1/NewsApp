@@ -1,4 +1,4 @@
-package com.example.newapp.data
+package com.example.newapp
 
 import android.content.ContentValues
 import android.content.Context
@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper
 data class FavoriteArticle(
     val id: String?,
     val title: String?,
-    val description: String,
+    val description: String?,
     val imageUrl: String?
 )
 
@@ -77,6 +77,9 @@ class LocalFavoritesDatabase(context: Context) :
     // ✅ Delete one favorite by ID
     fun deleteFavorite(id: String?) {
         writableDatabase.delete("favorites", "id = ?", arrayOf(id))
+    }
+    fun deleteAllFavorite() {
+        writableDatabase.delete("favorites", null, null)
     }
 
     // ✅ Check if an article exists in favorites

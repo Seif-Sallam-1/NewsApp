@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    //id("com.google.devtools.ksp")
     id("com.google.gms.google-services")
 }
 
@@ -52,45 +51,18 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    // Retrofit for networking
-    implementation("com.squareup.retrofit2:retrofit:2.9.0") // Note: 3.0.0 is a beta, 2.9.0 is the last stable
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-
-    // Glide for image loading
-    implementation("com.github.bumptech.glide:glide:4.16.0") // Updated to a more recent stable version
-
-    // Swipe to refresh
+    implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-
-    // --- CORRECTED FIREBASE DEPENDENCIES ---
-    // Import the Firebase Bill of Materials (BOM) - This manages versions for you.
-    implementation(platform("com.google.firebase:firebase-bom:33.1.0")) // Updated to a recent stable BOM
-
-    // Add the specific Firebase products you want to use.
-    // The BOM ensures their versions are compatible.
-    implementation("com.google.firebase:firebase-auth-ktx") // Use the -ktx version for Kotlin extensions
-    implementation("com.google.firebase:firebase-firestore-ktx") // Use the -ktx version
-
-    // REMOVED: You had libs.firebase.database.ktx but don't seem to need it. Add it back if you do.
-    // REMOVED: The non-ktx versions are not needed when you use -ktx.
-
-    // --- KOTLIN COROUTINES ---
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
-
-    // --- LIFECYCLE SCOPE ---
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.2") // Updated to a more recent stable version
-
-    // This adds Google AdMob SDK (used for showing ads)
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.2")
     implementation("com.google.android.gms:play-services-ads:23.1.0")
-
-
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
-    //ksp ("androidx.room:room-compiler:2.6.1")
 }
-/*ksp ("androidx.room:room-compiler:2.6.1")
-/* Optional but helpful (for coroutines) */
-
-

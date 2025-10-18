@@ -14,6 +14,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class NewsAdapter(val a: Activity, private var articles: ArrayList<Article>) :
     RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
@@ -37,8 +38,35 @@ class NewsAdapter(val a: Activity, private var articles: ArrayList<Article>) :
             .transition(DrawableTransitionOptions.withCrossFade(1000))
             .into(holder.binding.articleImage)
 
-        val url = article.url
+        // --- FAVORITES LOGIC WITH THE DEFINITIVE FIX ---
+        updateFavoriteIcon(holder.binding.favoriteButton, article.isFavorite)
 
+        holder.binding.favoriteButton?.setOnClickListener {
+            // Instantly update UI for responsiveness
+            article.isFavorite = !article.isFavorite
+            updateFavoriteIcon(holder.binding.favoriteButton, article.isFavorite)
+
+            // Perform DB operation in the background
+            CoroutineScope(Dispatchers.IO).launch {
+                if (article.isFavorite) {
+                    // We are ADDING a favorite. Call the function that returns the new ID.
+                    val newId = FirestoreManager.addFavorite(article)
+
+                    // CRUCIAL FIX: Update the article object in memory with the new ID.
+                    withContext(Dispatchers.Main) {
+                        article.firestoreId = newId
+                    }
+                } else {
+                    // We are REMOVING a favorite. The ID will now be correct.
+                    article.firestoreId?.let { id ->
+                        FirestoreManager.removeFavorite(id)
+                    }
+                }
+            }
+        }
+
+        // --- Other listeners (unchanged) ---
+        val url = article.url
         holder.binding.articleCont.setOnClickListener {
             val i = Intent(Intent.ACTION_VIEW, url?.toUri())
             a.startActivity(i)
@@ -52,27 +80,8 @@ class NewsAdapter(val a: Activity, private var articles: ArrayList<Article>) :
                 .setText(url)
                 .startChooser()
         }
-
-        // --- FAVORITES LOGIC (Works with the new FAB) ---
-        updateFavoriteIcon(holder.binding.favoriteButton, article.isFavorite)
-
-        holder.binding.favoriteButton?.setOnClickListener {
-            article.isFavorite = !article.isFavorite
-            updateFavoriteIcon(holder.binding.favoriteButton, article.isFavorite)
-
-            CoroutineScope(Dispatchers.IO).launch {
-                if (article.isFavorite) {
-                    FirestoreManager.addFavorite(article)
-                } else {
-                    article.firestoreId?.let { id ->
-                        FirestoreManager.removeFavorite(id)
-                    }
-                }
-            }
-        }
     }
 
-    // Helper function to change the star icon on the FAB
     private fun updateFavoriteIcon(fab: FloatingActionButton?, isFavorite: Boolean) {
         if (isFavorite) {
             fab?.setImageResource(R.drawable.ic_star_filled)
