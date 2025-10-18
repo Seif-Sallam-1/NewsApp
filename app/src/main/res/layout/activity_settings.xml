@@ -5,7 +5,7 @@
     android:id="@+id/settingsLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/GrayLight"
+    android:background="@color/ColorOnError"
     tools:context=".SettingsActivity">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -32,7 +32,8 @@
             android:layout_height="wrap_content"
             android:paddingBottom="8dp"
             android:text="Select News Country:"
-            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:textColor="@color/ColorPrimary"
             android:textSize="18sp" />
 
         <RadioGroup
@@ -44,36 +45,48 @@
                 android:id="@+id/radioUs"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
+                android:textStyle="bold"
                 android:text="United States 🇺🇸" />
 
             <RadioButton
                 android:id="@+id/radioEg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
+                android:textStyle="bold"
                 android:text="Egypt 🇪🇬" />
 
             <RadioButton
                 android:id="@+id/radioGb"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
+                android:textStyle="bold"
                 android:text="United Kingdom 🇬🇧" />
 
             <RadioButton
                 android:id="@+id/radioFr"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
+                android:textStyle="bold"
                 android:text="France 🇫🇷" />
 
             <RadioButton
                 android:id="@+id/radioDe"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
+                android:textStyle="bold"
                 android:text="Germany 🇩🇪" />
 
             <RadioButton
                 android:id="@+id/radioIt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
+                android:textStyle="bold"
                 android:text="Italy 🇮🇹" />
         </RadioGroup>
 
@@ -83,6 +96,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:backgroundTint="#536DFE"
+            android:layout_marginHorizontal="16dp"
             android:text="Save"
             android:textAllCaps="false"
             android:textColor="@android:color/white" />

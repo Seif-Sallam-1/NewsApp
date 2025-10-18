@@ -53,6 +53,7 @@
         <Button
             android:id="@+id/sign"
             android:text="Sign Up"
+            android:layout_marginHorizontal="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="#536DFE"

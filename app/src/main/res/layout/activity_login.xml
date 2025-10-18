@@ -55,6 +55,7 @@
         <Button
             android:id="@+id/loginBtn"
             android:text="Login"
+            android:layout_marginHorizontal="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="#536DFE"
